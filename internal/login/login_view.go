@@ -28,6 +28,7 @@ func UpdateView(w *nucular.Window) {
 
 	w.Label("token:", "RC")
 	login.tokenEditor.Flags = nucular.EditField
+	login.tokenEditor.PasswordChar = 1
 	login.tokenEditor.Edit(w)
 	login.token = string(login.tokenEditor.Buffer)
 
