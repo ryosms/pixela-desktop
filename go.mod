@@ -7,4 +7,5 @@ require (
 	github.com/aarzilli/nucular v0.0.0-20191227141642-cca133278403
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
+	golang.org/x/mobile v0.0.0-20190719004257-d2bd2a29d028
 )

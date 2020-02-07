@@ -3,6 +3,7 @@ package login
 import (
 	"fmt"
 	"github.com/aarzilli/nucular"
+	"github.com/ryosms/pixela-desktop/internal/graphs"
 	"github.com/ryosms/pixela-desktop/pkg/pixela"
 	"strings"
 )
@@ -45,14 +46,13 @@ func UpdateView(w *nucular.Window) {
 			login.message = "username and token are required."
 			return
 		}
-		graphs, err := pixela.GetGraphDefinitions(login.username, login.token)
+		graphList, err := pixela.GetGraphDefinitions(login.username, login.token)
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 			login.message = "login failed."
 		} else {
-			fmt.Printf("%+v\n", *graphs)
 			login.message = ""
-			w.Master().PopupOpen("graphs", nucular.WindowContextualReplace, w.Bounds, false, UpdateView)
+			graphs.ShowList(w, graphList)
 		}
 	}
 }
