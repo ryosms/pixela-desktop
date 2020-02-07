@@ -3,6 +3,8 @@ package login
 import (
 	"fmt"
 	"github.com/aarzilli/nucular"
+	"github.com/ryosms/pixela-desktop/pkg/pixela"
+	"strings"
 )
 
 type loginData struct {
@@ -11,6 +13,8 @@ type loginData struct {
 
 	usernameEditor nucular.TextEditor
 	tokenEditor    nucular.TextEditor
+
+	message string
 }
 
 var login loginData
@@ -33,7 +37,22 @@ func UpdateView(w *nucular.Window) {
 	login.token = string(login.tokenEditor.Buffer)
 
 	w.Row(30).Dynamic(1)
+	w.Label(login.message, "LC")
+
+	w.Row(30).Dynamic(1)
 	if w.ButtonText("Login") {
-		fmt.Printf("username: %s, token: %s\n", login.username, login.token)
+		if len(strings.TrimSpace(login.username)) == 0 || len(strings.TrimSpace(login.token)) == 0 {
+			login.message = "username and token are required."
+			return
+		}
+		graphs, err := pixela.GetGraphDefinitions(login.username, login.token)
+		if err != nil {
+			fmt.Printf("%+v\n", err)
+			login.message = "login failed."
+		} else {
+			fmt.Printf("%+v\n", *graphs)
+			login.message = ""
+			w.Master().PopupOpen("graphs", nucular.WindowContextualReplace, w.Bounds, false, UpdateView)
+		}
 	}
 }
