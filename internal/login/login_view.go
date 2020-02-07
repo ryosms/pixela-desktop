@@ -27,12 +27,12 @@ func UpdateView(w *nucular.Window) {
 	w.Row(30).Ratio(0.2, 0.8)
 
 	w.Label("username:", "RC")
-	login.usernameEditor.Flags = nucular.EditField
+	login.usernameEditor.Flags = nucular.EditField | nucular.EditIbeamCursor
 	login.usernameEditor.Edit(w)
 	login.username = string(login.usernameEditor.Buffer)
 
 	w.Label("token:", "RC")
-	login.tokenEditor.Flags = nucular.EditField
+	login.tokenEditor.Flags = nucular.EditField | nucular.EditIbeamCursor
 	login.tokenEditor.PasswordChar = 1
 	login.tokenEditor.Edit(w)
 	login.token = string(login.tokenEditor.Buffer)
