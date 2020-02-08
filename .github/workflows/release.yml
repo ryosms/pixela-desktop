@@ -19,10 +19,10 @@ jobs:
 
       - uses: actions/cache@v1
         with:
-          - path: ~/go/pkg/mod
-            key: v1-${{ runner.os }}-gomod-${{ hashFiles('**/go.sum') }}
-            restore-keys: |
-              - v1-${{ runner.os }}-gomod-
+          path: ~/go/pkg/mod
+          key: v1-${{ runner.os }}-gomod-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            - v1-${{ runner.os }}-gomod-
 
       - name: dep
         run: go mod download
