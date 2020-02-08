@@ -12,7 +12,7 @@ builds:
     goarch:
       - amd64
     flags:
-      - -tags nucular_shiny
+      - -tags=nucular_shiny
 archives:
   - replacements:
       darwin: macOS
