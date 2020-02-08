@@ -21,6 +21,6 @@ jobs:
           path: ~/go/pkg/mod
           key: v1-${{ runner.os }}-gomod-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            v-1${{ runner.os }}-gomod-
+            v1-${{ runner.os }}-gomod-
       - name: test
         run: go test -v -cover ./...

@@ -1,0 +1,38 @@
+---
+name: release
+on:
+  push:
+    branches-ignore:
+      - "**"
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13.x
+
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: v1-${{ runner.os }}-gomod-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            - v1-${{ runner.os }}-gomod-
+
+      - name: dep
+        run: go mod download
+
+      - name: release
+        uses: goreleaser/goreleaser-action@v1
+        with:
+          version: latest
+          args: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
