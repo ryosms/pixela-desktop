@@ -11,6 +11,8 @@ builds:
       - darwin
     goarch:
       - amd64
+    flags:
+      - -tags=nucular_shiny,metal
 release:
   draft: true
   prerelease: true
