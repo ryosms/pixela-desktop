@@ -11,8 +11,9 @@ builds:
       - darwin
     goarch:
       - amd64
-    flags:
-      - -tags=nucular_shiny
+release:
+  draft: true
+  prerelease: true
 archives:
   - replacements:
       darwin: macOS
