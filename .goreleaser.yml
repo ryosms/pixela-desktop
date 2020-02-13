@@ -12,7 +12,7 @@ builds:
     goarch:
       - amd64
     flags:
-      - -tags=nucular_shiny,metal
+      - -tags=nucular_shiny
 release:
   draft: true
   prerelease: true
