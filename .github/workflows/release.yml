@@ -9,7 +9,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: setup go
         uses: actions/setup-go@v1
