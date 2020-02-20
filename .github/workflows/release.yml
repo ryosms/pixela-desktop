@@ -9,7 +9,7 @@ on:
 
 jobs:
   release:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: setup go
         uses: actions/setup-go@v1
@@ -26,13 +26,30 @@ jobs:
           restore-keys: |
             - v1-${{ runner.os }}-gomod-
 
+      - name: setup xgo
+        run: go get github.com/crazy-max/xgo
+
       - name: dep
         run: go mod download
 
+      - name: make binary and compress
+        run: |
+          export PATH=${PATH}:$(go env GOPATH)/bin
+          make all
+          mkdir -p build/release
+          cp README.md LICENSE build/pixela-desktop_Linux_x86_64
+          cp README.md LICENSE build/pixela-desktop_macOS_x86_64
+          cp README.md LICENSE build/pixela-desktop_Windows_x86_64
+          zip -j build/release/pixela-desktop_macOS_x86_64.zip build/pixela-desktop_macOS_x86_64/*
+          zip -j build/release/pixela-desktop_Windows_x86_64.zip build/pixela-desktop_Windows_x86_64/*
+          cd build && tar -zcvf release/pixela-desktop_Linux_x86_64.tar.gz pixela-desktop_Linux_x86_64/*
+
       - name: release
-        uses: goreleaser/goreleaser-action@v1
-        with:
-          version: latest
-          args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref }}
+          GO111MODULE: on
+        run: |
+          go get -u github.com/tcnksm/ghr
+          export TAGNAME=$(echo ${RELEASE_TAG} | sed -e 's!refs/tags/!!g')
+          $(go env GOPATH)/bin/ghr -n "${TAGNAME}" -b "${TAGNAME}" -draft -prerelease  ${TAGNAME} build/release
