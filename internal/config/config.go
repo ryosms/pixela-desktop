@@ -12,7 +12,13 @@ type Credential struct {
 	Token    string `toml:"token"`
 }
 
+type FontConfig struct {
+	Path string `toml:"path"`
+	Size int    `toml:"size"`
+}
+
 type Config struct {
+	Font        FontConfig   `toml:"font"`
 	Credentials []Credential `toml:"users"`
 }
 
@@ -38,7 +44,7 @@ func (config *Config) Save(configPath string) error {
 }
 
 func DefaultConfigPath() string {
-	path, _ := homedir.Expand(filepath.FromSlash("~/.pixela/credentials"))
+	path, _ := homedir.Expand(filepath.FromSlash("~/.pixela/config"))
 	return path
 }
 
