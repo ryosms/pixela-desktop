@@ -9,6 +9,7 @@ import (
 )
 
 type GraphListView struct {
+	username      string
 	graphs        *[]pixela.GraphDefinition
 	size          int
 	selectedIndex int
@@ -24,8 +25,9 @@ const windowFlag = nucular.WindowTitle | nucular.WindowClosable
 
 var listView GraphListView
 
-func ShowList(w *nucular.Window, graphs *[]pixela.GraphDefinition) {
+func ShowList(w *nucular.Window, username string, graphs *[]pixela.GraphDefinition) {
 	listView = GraphListView{
+		username:      username,
 		graphs:        graphs,
 		size:          len(*graphs),
 		selectedIndex: -1,
@@ -65,7 +67,7 @@ func updateListView(w *nucular.Window) {
 				graph.Id, graph.Name, graph.Color)
 			if w.SelectableLabel(label, "LT", &selected) {
 				if doubleClick(i, listView.clickedIndex, listView.clickedTime) {
-					ShowDetail(listView.parent, graph)
+					ShowDetail(listView.parent, listView.username, graph)
 					return
 				}
 				listView.clickedIndex = i

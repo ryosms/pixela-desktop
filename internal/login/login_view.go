@@ -52,7 +52,7 @@ func UpdateView(w *nucular.Window) {
 			login.message = "login failed."
 		} else {
 			login.message = ""
-			graphs.ShowList(w, graphList)
+			graphs.ShowList(w, login.username, graphList)
 		}
 	}
 }
