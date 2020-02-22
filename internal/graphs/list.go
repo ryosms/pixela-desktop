@@ -22,10 +22,10 @@ type GraphListView struct {
 
 const windowFlag = nucular.WindowTitle | nucular.WindowClosable
 
-var view GraphListView
+var listView GraphListView
 
 func ShowList(w *nucular.Window, graphs *[]pixela.GraphDefinition) {
-	view = GraphListView{
+	listView = GraphListView{
 		graphs:        graphs,
 		size:          len(*graphs),
 		selectedIndex: -1,
@@ -40,46 +40,46 @@ func updateListView(w *nucular.Window) {
 	for _, e := range w.Input().Keyboard.Keys {
 		switch e.Code {
 		case key.CodeDownArrow:
-			view.selectedIndex++
-			if view.selectedIndex >= view.size {
-				view.selectedIndex = view.size - 1
+			listView.selectedIndex++
+			if listView.selectedIndex >= listView.size {
+				listView.selectedIndex = listView.size - 1
 			}
-			view.centering = true
+			listView.centering = true
 		case key.CodeUpArrow:
-			view.selectedIndex--
-			if view.selectedIndex < 0 {
-				view.selectedIndex = 0
+			listView.selectedIndex--
+			if listView.selectedIndex < 0 {
+				listView.selectedIndex = 0
 			}
-			view.centering = true
+			listView.centering = true
 		}
 	}
 
 	w.Row(0).Dynamic(1)
-	if gl, w := nucular.GroupListStart(w, view.size, "graph list", nucular.WindowNoHScrollbar); w != nil {
+	if gl, w := nucular.GroupListStart(w, listView.size, "graph list", nucular.WindowNoHScrollbar); w != nil {
 		w.Row(40).Dynamic(1)
 		for gl.Next() {
 			i := gl.Index()
-			graph := (*view.graphs)[i]
-			selected := i == view.selectedIndex
+			graph := (*listView.graphs)[i]
+			selected := i == listView.selectedIndex
 			label := fmt.Sprintf("%s: %s\n    %s",
 				graph.Id, graph.Name, graph.Color)
 			if w.SelectableLabel(label, "LT", &selected) {
-				if doubleClick(i, view.clickedIndex, view.clickedTime) {
-					fmt.Println("double clicked!" + graph.Id)
+				if doubleClick(i, listView.clickedIndex, listView.clickedTime) {
+					ShowDetail(listView.parent, graph)
 					return
 				}
-				view.clickedIndex = i
-				view.clickedTime = time.Now()
+				listView.clickedIndex = i
+				listView.clickedTime = time.Now()
 			}
 			if selected {
-				view.selectedIndex = i
-				if view.centering {
+				listView.selectedIndex = i
+				if listView.centering {
 					gl.Center()
 				}
 			}
 		}
 	}
-	w.Bounds = view.parent.Bounds
+	w.Bounds = listView.parent.Bounds
 	w.WidgetBounds()
 }
 
