@@ -55,3 +55,43 @@ func GetGraphDefinitions(username string, token string) (*[]GraphDefinition, err
 	}
 	return &graphs.Graphs, nil
 }
+
+type GraphStats struct {
+	TotalPixelsCount int     `json:"totalPixelsCount"`
+	MaxQuantity      float64 `json:"maxQuantity"`
+	MinQuantity      float64 `json:"minQuantity"`
+	TotalQuantity    float64 `json:"totalQuantity"`
+	AvgQuantity      float64 `json:"AvgQuantity"`
+	TodaysQuantity   float64 `json:"TodaysQuantity"`
+}
+
+func GetGraphStats(username string, graphId string) (*GraphStats, error) {
+	path := fmt.Sprintf("users/%s/graphs/%s/stats", username, graphId)
+	req, err := generateRequest("GET", path, nil, nil)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	defer func() { _ = res.Body.Close() }()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("%d: %s", res.StatusCode, string(b))
+	}
+
+	var stats GraphStats
+	err = json.Unmarshal(b, &stats)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &stats, nil
+}
