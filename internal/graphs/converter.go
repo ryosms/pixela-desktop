@@ -21,24 +21,22 @@ type frame struct {
 }
 
 type outerGroup struct {
+	Transform  string      `xml:"transform,attr"`
 	WeekGroups []weekGroup `xml:"g"`
 }
 
 type weekGroup struct {
-	Pixels []pixel `xml:"rect"`
+	Transform string  `xml:"transform,attr"`
+	Pixels    []pixel `xml:"rect"`
 }
 
 type pixel struct {
-	TippyContent string `xml:"data-tippy-content,attr"`
-	Class        string `xml:"class,attr"`
-	Width        string `xml:"width,attr"`
-	Height       string `xml:"height,attr"`
-	X            string `xml:"x,attr"`
-	Y            string `xml:"y,attr"`
-	Fill         string `xml:"fill,attr"`
-	DataCount    string `xml:"data-count:attr"`
-	DataDate     string `xml:"data-date:attr"`
-	DataUnit     string `xml:"data-unit:attr"`
+	Class  string `xml:"class,attr"`
+	Width  int    `xml:"width,attr"`
+	Height int    `xml:"height,attr"`
+	X      int    `xml:"x,attr"`
+	Y      int    `xml:"y,attr"`
+	Fill   string `xml:"fill,attr"`
 }
 
 func convertSvg(svg []byte) (*image.RGBA, error) {
