@@ -79,3 +79,22 @@ func GetGraphStats(username string, graphId string) (*GraphStats, error) {
 	}
 	return &stats, nil
 }
+
+func GetGraphSvg(username string, graphId string, date *string) ([]byte, error) {
+	url := GenerateUrl("users", username, "graphs", graphId)
+	if date != nil {
+		q := url.Query()
+		q.Set("date", *date)
+		url.RawQuery = q.Encode()
+	}
+	req, err := generateRequest("GET", url, nil, nil)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	st, b, err := doRequest(req)
+	if st != http.StatusOK {
+		return nil, fmt.Errorf("%d: %s", st, string(b))
+	}
+
+	return b, nil
+}
