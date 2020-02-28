@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -32,20 +31,12 @@ func GetGraphDefinitions(username string, token string) (*[]GraphDefinition, err
 		return nil, errors.WithStack(err)
 	}
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	st, b, err := doRequest(req)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	defer func() { _ = res.Body.Close() }()
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%d: %s", res.StatusCode, string(b))
+	if st != http.StatusOK {
+		return nil, fmt.Errorf("%d: %s", st, string(b))
 	}
 
 	var graphs listGraphs
@@ -72,20 +63,13 @@ func GetGraphStats(username string, graphId string) (*GraphStats, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	st, b, err := doRequest(req)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	defer func() { _ = res.Body.Close() }()
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%d: %s", res.StatusCode, string(b))
+	if st != http.StatusOK {
+		return nil, fmt.Errorf("%d: %s", st, string(b))
 	}
 
 	var stats GraphStats
