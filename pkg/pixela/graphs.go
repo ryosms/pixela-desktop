@@ -26,8 +26,8 @@ type listGraphs struct {
 }
 
 func GetGraphDefinitions(username string, token string) (*[]GraphDefinition, error) {
-	path := fmt.Sprintf("users/%s/graphs", username)
-	req, err := generateRequest("GET", path, &token, nil)
+	url := GenerateUrl("users", username, "graphs")
+	req, err := generateRequest("GET", url, &token, nil)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

@@ -3,7 +3,6 @@ package pixela
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
@@ -13,7 +12,7 @@ import (
 
 const apiEndpoint string = "https://pixe.la/v1"
 
-func generateRequest(method string, path string, token *string, reqParams interface{}) (*http.Request, error) {
+func generateRequest(method string, url *url.URL, token *string, reqParams interface{}) (*http.Request, error) {
 	var body io.Reader
 	if reqParams != nil {
 		params, err := json.Marshal(reqParams)
@@ -23,7 +22,7 @@ func generateRequest(method string, path string, token *string, reqParams interf
 		body = bytes.NewBuffer(params)
 	}
 
-	req, err := http.NewRequest(method, fmt.Sprintf("%s/%s", apiEndpoint, path), body)
+	req, err := http.NewRequest(method, url.String(), body)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
