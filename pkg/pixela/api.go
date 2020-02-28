@@ -7,6 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
+	"net/url"
+	"path"
 )
 
 const apiEndpoint string = "https://pixe.la/v1"
@@ -32,4 +34,15 @@ func generateRequest(method string, path string, token *string, reqParams interf
 	}
 
 	return req, nil
+}
+
+func GenerateUrl(paths ...string) *url.URL {
+	u, err := url.Parse(apiEndpoint)
+	if err != nil {
+		panic("the definition of `apiEndpoint` is wrong")
+	}
+	for _, p := range paths {
+		u.Path = path.Join(u.Path, p)
+	}
+	return u
 }
