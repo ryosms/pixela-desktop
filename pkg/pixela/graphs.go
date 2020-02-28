@@ -66,8 +66,8 @@ type GraphStats struct {
 }
 
 func GetGraphStats(username string, graphId string) (*GraphStats, error) {
-	path := fmt.Sprintf("users/%s/graphs/%s/stats", username, graphId)
-	req, err := generateRequest("GET", path, nil, nil)
+	url := GenerateUrl("usrs", username, "graphs", graphId, "stats")
+	req, err := generateRequest("GET", url, nil, nil)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
