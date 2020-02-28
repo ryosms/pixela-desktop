@@ -57,7 +57,7 @@ type GraphStats struct {
 }
 
 func GetGraphStats(username string, graphId string) (*GraphStats, error) {
-	url := GenerateUrl("usrs", username, "graphs", graphId, "stats")
+	url := GenerateUrl("users", username, "graphs", graphId, "stats")
 	req, err := generateRequest("GET", url, nil, nil)
 	if err != nil {
 		return nil, errors.WithStack(err)
