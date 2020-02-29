@@ -51,6 +51,10 @@ func updateDetailView(w *nucular.Window) {
 	}
 	w.Label(g.Name, "LC")
 
+	w.Row(20).Static(60, 0)
+	w.LabelColored(g.Color, "LT", *(pixela.DisplayColorByName(g.Color)))
+	w.Label(fmt.Sprintf("id: %s", g.Id), "LT")
+
 	if detailView.img != nil {
 		w.Row(int(float64(detailView.img.Rect.Max.Y) / 1.5)).Dynamic(1)
 		w.Image(detailView.img)
