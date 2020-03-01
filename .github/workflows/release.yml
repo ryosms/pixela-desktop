@@ -60,4 +60,4 @@ jobs:
         run: |
           go get -u github.com/tcnksm/ghr
           export TAGNAME=$(echo ${RELEASE_TAG} | sed -e 's!refs/tags/!!g')
-          $(go env GOPATH)/bin/ghr -n "${TAGNAME}" -b "${TAGNAME}" -draft -prerelease  ${TAGNAME} build/release
+          $(go env GOPATH)/bin/ghr -n "${TAGNAME}" -b "${TAGNAME}" -draft -prerelease  ${TAGNAME} build/release/
