@@ -54,7 +54,12 @@ func convertSvg(svg []byte) (*image.RGBA, error) {
 	img := image.NewRGBA(image.Rect(frame.X, frame.Y, frame.X+frame.Width, frame.Y+frame.Height))
 
 	fillRect(img, img.Rect, white)
-	err = drawPixels(img, &pixels.OuterGroup)
+
+	x, y, err := transformXY(pixels.OuterGroup.Transform)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	err = drawPixels(img, x, y, &pixels.OuterGroup.WeekGroups)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -62,12 +67,8 @@ func convertSvg(svg []byte) (*image.RGBA, error) {
 	return img, nil
 }
 
-func drawPixels(img *image.RGBA, svg *outerGroup) error {
-	topX, topY, err := transformXY(svg.Transform)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	for _, g := range svg.WeekGroups {
+func drawPixels(img *image.RGBA, topX int, topY int, svg *[]weekGroup) error {
+	for _, g := range *svg {
 		if len(g.Transform) == 0 {
 			continue
 		}
