@@ -3,7 +3,11 @@ package graphs
 import (
 	"encoding/xml"
 	"fmt"
+	"github.com/golang/freetype/truetype"
 	"github.com/pkg/errors"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/gofont/goregular"
+	"golang.org/x/image/math/fixed"
 	"image"
 	"image/color"
 	"strings"
@@ -25,6 +29,7 @@ type frame struct {
 type outerGroup struct {
 	Transform  string      `xml:"transform,attr"`
 	WeekGroups []weekGroup `xml:"g"`
+	Text       []text      `xml:"text"`
 }
 
 type weekGroup struct {
@@ -39,6 +44,12 @@ type pixel struct {
 	X      int    `xml:"x,attr"`
 	Y      int    `xml:"y,attr"`
 	Fill   string `xml:"fill,attr"`
+}
+
+type text struct {
+	Text string `xml:",innerxml"`
+	X    int    `xml:"x,attr"`
+	Y    int    `xml:"y,attr"`
 }
 
 var white = color.RGBA{R: 255, G: 255, B: 255, A: 255}
@@ -60,6 +71,11 @@ func convertSvg(svg []byte) (*image.RGBA, error) {
 		return nil, errors.WithStack(err)
 	}
 	err = drawPixels(img, x, y, &pixels.OuterGroup.WeekGroups)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	err = drawTexts(img, x, y, &pixels.OuterGroup.Text)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -131,4 +147,27 @@ func fillToColor(fill string) (c color.RGBA, err error) {
 	}
 
 	return
+}
+
+func drawTexts(img *image.RGBA, topX int, topY int, texts *[]text) error {
+	ft, err := truetype.Parse(goregular.TTF)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	face := truetype.NewFace(ft, &truetype.Options{Size: 14})
+	drawer := &font.Drawer{
+		Dst:  img,
+		Src:  image.NewUniform(color.Black),
+		Face: face,
+	}
+	for _, t := range *texts {
+		drawText(drawer, topX, topY, &t)
+	}
+	return nil
+}
+
+func drawText(drawer *font.Drawer, topX int, topY int, text *text) {
+	drawer.Dot.X = fixed.I(topX + text.X)
+	drawer.Dot.Y = fixed.I(topY + text.Y)
+	drawer.DrawString(text.Text)
 }
