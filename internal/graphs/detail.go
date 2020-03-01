@@ -6,6 +6,7 @@ import (
 	"github.com/aarzilli/nucular/rect"
 	"github.com/ryosms/pixela-desktop/pkg/pixela"
 	"image"
+	"image/color"
 	"time"
 )
 
@@ -68,13 +69,13 @@ func updateDetailView(w *nucular.Window) {
 	}
 	if len(detailView.imgError) > 0 {
 		w.Row(40).Dynamic(1)
-		w.Label(detailView.imgError, "LT")
+		w.LabelColored(detailView.imgError, "LT", color.RGBA{R: 0xFF, A: 0xFF})
 	}
 
 	if w.TreePush(nucular.TreeTab, "Stats", false) {
 		if len(detailView.statsError) > 0 {
 			w.Row(40).Dynamic(1)
-			w.Label(detailView.statsError, "LT")
+			w.LabelColored(detailView.statsError, "LT", color.RGBA{R: 0xFF, A: 0xFF})
 		}
 		if detailView.stats != nil {
 			showStats(w, detailView.stats, g.Unit)

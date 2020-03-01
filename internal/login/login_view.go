@@ -5,6 +5,7 @@ import (
 	"github.com/aarzilli/nucular"
 	"github.com/ryosms/pixela-desktop/internal/graphs"
 	"github.com/ryosms/pixela-desktop/pkg/pixela"
+	"image/color"
 	"strings"
 )
 
@@ -38,7 +39,7 @@ func UpdateView(w *nucular.Window) {
 	login.token = string(login.tokenEditor.Buffer)
 
 	w.Row(30).Dynamic(1)
-	w.Label(login.message, "LC")
+	w.LabelColored(login.message, "LC", color.RGBA{R: 0xFF, A: 0xFF})
 
 	w.Row(30).Dynamic(1)
 	if w.ButtonText("Login") {
