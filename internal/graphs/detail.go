@@ -13,6 +13,7 @@ type GraphDetailView struct {
 	parent     *nucular.Window
 	stats      *pixela.GraphStats
 	statsError string
+	modeShort  bool
 	img        *image.RGBA
 	imgError   string
 }
@@ -56,8 +57,7 @@ func updateDetailView(w *nucular.Window) {
 	w.Label(fmt.Sprintf("id: %s", g.Id), "LT")
 
 	if detailView.img != nil {
-		w.Row(int(float64(detailView.img.Rect.Max.Y) / 1.5)).Dynamic(1)
-		w.Image(detailView.img)
+		showImage(w)
 	}
 	if len(detailView.imgError) > 0 {
 		w.Row(40).Dynamic(1)
@@ -92,7 +92,7 @@ func loadSvgImage(date string) {
 	if len(date) == 0 {
 		d = nil
 	}
-	svg, err := pixela.GetGraphSvg(detailView.username, detailView.graph.Id, d)
+	svg, err := pixela.GetGraphSvg(detailView.username, detailView.graph.Id, detailView.modeShort, d)
 	if err != nil {
 		detailView.imgError = "failed to get svg data"
 		fmt.Printf("%+v\n", err)
@@ -106,6 +106,26 @@ func loadSvgImage(date string) {
 			detailView.img = img
 		}
 	}
+}
+
+func showImage(w *nucular.Window) {
+	w.Row(30).Static(5, 80, 80)
+	w.Spacing(1)
+	if w.OptionText("Full", !detailView.modeShort) {
+		detailView.modeShort = false
+		loadSvgImage("")
+	}
+	if w.OptionText("Short", detailView.modeShort) {
+		detailView.modeShort = true
+		loadSvgImage("")
+	}
+
+	w.RowScaled(detailView.img.Rect.Max.Y).StaticScaled(5, detailView.img.Rect.Max.X)
+	w.Spacing(1)
+	w.Image(detailView.img)
+
+	w.Row(30).Dynamic(4)
+
 }
 
 func showStats(w *nucular.Window, st *pixela.GraphStats, unit string) {

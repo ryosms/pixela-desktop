@@ -80,13 +80,16 @@ func GetGraphStats(username string, graphId string) (*GraphStats, error) {
 	return &stats, nil
 }
 
-func GetGraphSvg(username string, graphId string, date *string) ([]byte, error) {
+func GetGraphSvg(username string, graphId string, shortGraph bool, date *string) ([]byte, error) {
 	url := GenerateUrl("users", username, "graphs", graphId)
-	if date != nil {
-		q := url.Query()
-		q.Set("date", *date)
-		url.RawQuery = q.Encode()
+	q := url.Query()
+	if shortGraph {
+		q.Set("mode", "short")
 	}
+	if date != nil {
+		q.Set("date", *date)
+	}
+	url.RawQuery = q.Encode()
 	req, err := generateRequest("GET", url, nil, nil)
 	if err != nil {
 		return nil, errors.WithStack(err)
