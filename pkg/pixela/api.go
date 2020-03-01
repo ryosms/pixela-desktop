@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/pkg/errors"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
@@ -33,6 +34,23 @@ func generateRequest(method string, url *url.URL, token *string, reqParams inter
 	}
 
 	return req, nil
+}
+
+func doRequest(req *http.Request) (statusCode int, body []byte, err error) {
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return 0, nil, errors.WithStack(err)
+	}
+
+	body, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		return 0, nil, errors.WithStack(err)
+	}
+	defer func() { _ = res.Body.Close() }()
+
+	statusCode = res.StatusCode
+	return
 }
 
 func GenerateUrl(paths ...string) *url.URL {
