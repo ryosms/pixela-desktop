@@ -71,12 +71,15 @@ func updateDetailView(w *nucular.Window) {
 		w.Label(detailView.imgError, "LT")
 	}
 
-	if len(detailView.statsError) > 0 {
-		w.Row(40).Dynamic(1)
-		w.Label(detailView.statsError, "LT")
-	}
-	if detailView.stats != nil {
-		showStats(w, detailView.stats, g.Unit)
+	if w.TreePush(nucular.TreeTab, "Stats", false) {
+		if len(detailView.statsError) > 0 {
+			w.Row(40).Dynamic(1)
+			w.Label(detailView.statsError, "LT")
+		}
+		if detailView.stats != nil {
+			showStats(w, detailView.stats, g.Unit)
+		}
+		w.TreePop()
 	}
 
 	if w.TreePush(nucular.TreeTab, "Definition", false) {
@@ -167,18 +170,14 @@ func showImage(w *nucular.Window) {
 }
 
 func showStats(w *nucular.Window, st *pixela.GraphStats, unit string) {
-	if w.TreePush(nucular.TreeTab, "Stats", false) {
-		w.Row(30).Dynamic(1)
-		w.Label(fmt.Sprintf("Today: %v %s", st.TodaysQuantity, unit), "LT")
+	w.Row(30).Dynamic(1)
+	w.Label(fmt.Sprintf("Today: %v %s", st.TodaysQuantity, unit), "LT")
 
-		w.Row(20).Dynamic(1)
-		w.Label(fmt.Sprintf("Total: %v %s", st.TotalQuantity, unit), "LT")
-		w.Label(fmt.Sprintf("Max: %v %s", st.MaxQuantity, unit), "LT")
-		w.Label(fmt.Sprintf("Min: %v %s", st.MinQuantity, unit), "LT")
-		w.Label(fmt.Sprintf("Total Pixels: %v %s", st.TotalPixelsCount, unit), "LT")
-
-		w.TreePop()
-	}
+	w.Row(20).Dynamic(1)
+	w.Label(fmt.Sprintf("Total: %v %s", st.TotalQuantity, unit), "LT")
+	w.Label(fmt.Sprintf("Max: %v %s", st.MaxQuantity, unit), "LT")
+	w.Label(fmt.Sprintf("Min: %v %s", st.MinQuantity, unit), "LT")
+	w.Label(fmt.Sprintf("Total Pixels: %v %s", st.TotalPixelsCount, unit), "LT")
 }
 
 func changeSvgDate(newDate time.Time) {
