@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"net/http"
+	"time"
 )
 
 type GraphDefinition struct {
@@ -80,14 +81,14 @@ func GetGraphStats(username string, graphId string) (*GraphStats, error) {
 	return &stats, nil
 }
 
-func GetGraphSvg(username string, graphId string, shortGraph bool, date *string) ([]byte, error) {
+func GetGraphSvg(username string, graphId string, shortGraph bool, date *time.Time) ([]byte, error) {
 	url := GenerateUrl("users", username, "graphs", graphId)
 	q := url.Query()
 	if shortGraph {
 		q.Set("mode", "short")
 	}
 	if date != nil {
-		q.Set("date", *date)
+		q.Set("date", date.Format("20060102"))
 	}
 	url.RawQuery = q.Encode()
 	req, err := generateRequest("GET", url, nil, nil)

@@ -3,34 +3,41 @@ package graphs
 import (
 	"fmt"
 	"github.com/aarzilli/nucular"
+	"github.com/aarzilli/nucular/rect"
 	"github.com/ryosms/pixela-desktop/pkg/pixela"
 	"image"
+	"time"
 )
 
 type GraphDetailView struct {
-	username   string
-	graph      pixela.GraphDefinition
-	parent     *nucular.Window
-	stats      *pixela.GraphStats
-	statsError string
-	modeShort  bool
-	img        *image.RGBA
-	imgError   string
+	username    string
+	graph       pixela.GraphDefinition
+	parent      *nucular.Window
+	stats       *pixela.GraphStats
+	statsError  string
+	modeShort   bool
+	displayDate time.Time
+	dateString  string
+	dateEditor  nucular.TextEditor
+	img         *image.RGBA
+	imgError    string
 }
 
 var detailView GraphDetailView
 
 func ShowDetail(w *nucular.Window, username string, graphDef pixela.GraphDefinition) {
 	detailView = GraphDetailView{
-		username: username,
-		graph:    graphDef,
-		parent:   w,
+		username:    username,
+		graph:       graphDef,
+		parent:      w,
+		displayDate: time.Now(),
 	}
+	detailView.dateEditor.Buffer = []rune(detailView.displayDate.Format("2006-01-02"))
 
 	w.Master().PopupOpen(graphDef.Name, 0, w.Bounds, false, updateDetailView)
 
 	go func() {
-		loadSvgImage("")
+		loadSvgImage()
 	}()
 
 	go func() {
@@ -87,12 +94,9 @@ func updateDetailView(w *nucular.Window) {
 	w.WidgetBounds()
 }
 
-func loadSvgImage(date string) {
-	d := &date
-	if len(date) == 0 {
-		d = nil
-	}
-	svg, err := pixela.GetGraphSvg(detailView.username, detailView.graph.Id, detailView.modeShort, d)
+func loadSvgImage() {
+	d := &detailView
+	svg, err := pixela.GetGraphSvg(d.username, d.graph.Id, d.modeShort, &d.displayDate)
 	if err != nil {
 		detailView.imgError = "failed to get svg data"
 		fmt.Printf("%+v\n", err)
@@ -109,23 +113,57 @@ func loadSvgImage(date string) {
 }
 
 func showImage(w *nucular.Window) {
+	v := &detailView
 	w.Row(30).Static(5, 80, 80)
 	w.Spacing(1)
-	if w.OptionText("Full", !detailView.modeShort) {
-		detailView.modeShort = false
-		loadSvgImage("")
+	if w.OptionText("Full", !v.modeShort) {
+		if v.modeShort {
+			v.modeShort = false
+			go loadSvgImage()
+		}
 	}
-	if w.OptionText("Short", detailView.modeShort) {
-		detailView.modeShort = true
-		loadSvgImage("")
+	if w.OptionText("Short", v.modeShort) {
+		if !v.modeShort {
+			v.modeShort = true
+			go loadSvgImage()
+		}
 	}
 
-	w.RowScaled(detailView.img.Rect.Max.Y).StaticScaled(5, detailView.img.Rect.Max.X)
+	w.RowScaled(v.img.Rect.Max.Y).StaticScaled(5, v.img.Rect.Max.X)
 	w.Spacing(1)
-	w.Image(detailView.img)
+	w.Image(v.img)
 
-	w.Row(30).Dynamic(4)
+	w.Row(30).Static(5, 80, 120, 80, 80)
+	w.Spacing(1)
+	if w.ButtonText("Prev") {
+		if v.modeShort {
+			changeSvgDate(v.displayDate.AddDate(0, -3, 0))
+		} else {
+			changeSvgDate(v.displayDate.AddDate(-1, 0, 0))
+		}
+	}
 
+	v.dateEditor.Flags = nucular.EditField | nucular.EditIbeamCursor
+	v.dateEditor.Maxlen = 10
+	v.dateEditor.Edit(w)
+	v.dateString = string(v.dateEditor.Buffer)
+
+	if w.ButtonText("Go") {
+		d, err := time.Parse("2006-01-02", v.dateString)
+		if err != nil {
+			w.Master().PopupOpen("Error", nucular.WindowMovable|nucular.WindowClosable|nucular.WindowTitle|nucular.WindowDynamic|nucular.WindowNoScrollbar, rect.Rect{X: 20, Y: 100, W: 240, H: 150}, true, popUpDateError)
+		} else {
+			changeSvgDate(d)
+		}
+	}
+
+	if w.ButtonText("Next") {
+		if v.modeShort {
+			changeSvgDate(v.displayDate.AddDate(0, 3, 0))
+		} else {
+			changeSvgDate(v.displayDate.AddDate(1, 0, 0))
+		}
+	}
 }
 
 func showStats(w *nucular.Window, st *pixela.GraphStats, unit string) {
@@ -141,4 +179,15 @@ func showStats(w *nucular.Window, st *pixela.GraphStats, unit string) {
 
 		w.TreePop()
 	}
+}
+
+func changeSvgDate(newDate time.Time) {
+	detailView.displayDate = newDate
+	detailView.dateEditor.Buffer = []rune(newDate.Format("2006-01-02"))
+	go loadSvgImage()
+}
+
+func popUpDateError(w *nucular.Window) {
+	w.Row(0).Dynamic(1)
+	w.LabelWrap("The input value is invalid. Valid input is formatted 'yyyy-MM-dd'.")
 }
