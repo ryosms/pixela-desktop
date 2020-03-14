@@ -41,7 +41,7 @@ jobs:
       - name: generate font data
         run: |
           go get github.com/rakyll/statik
-          go generate
+          $(go env GOPATH)/bin/statik -f -include=*.ttf -src=fonts
 
       - name: make binary
         run: |
