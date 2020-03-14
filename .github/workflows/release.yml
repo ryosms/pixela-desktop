@@ -32,22 +32,28 @@ jobs:
       - name: dep
         run: go mod download
 
+      - name: download font
+        run: |
+          mkdir -p fonts
+          wget -O fonts/ipaexg00401.zip https://ipafont.ipa.go.jp/IPAexfont/ipaexg00401.zip
+          cd fonts && unzip ipaexg00401.zip
+
+      - name: generate font data
+        run: |
+          go get github.com/rakyll/statik
+          $(go env GOPATH)/bin/statik -f -include=*.ttf -src=fonts
+
       - name: make binary
         run: |
           export PATH=${PATH}:$(go env GOPATH)/bin
           make all
 
-      - name: download font
-        run: |
-          wget -O build/ipaexg00401.zip https://ipafont.ipa.go.jp/IPAexfont/ipaexg00401.zip
-          cd build && unzip ipaexg00401.zip
-
       - name: create assets
         run: |
           mkdir -p build/release
-          cp README.md LICENSE build/ipaexg00401/ipaexg.ttf build/ipaexg00401/IPA_Font_License_Agreement_v1.0.txt build/pixela-desktop_Linux_x86_64
-          cp README.md LICENSE build/ipaexg00401/ipaexg.ttf build/ipaexg00401/IPA_Font_License_Agreement_v1.0.txt build/pixela-desktop_macOS_x86_64
-          cp README.md LICENSE build/ipaexg00401/ipaexg.ttf build/ipaexg00401/IPA_Font_License_Agreement_v1.0.txt build/pixela-desktop_Windows_x86_64
+          cp README.md LICENSE fonts/ipaexg00401/IPA_Font_License_Agreement_v1.0.txt build/pixela-desktop_Linux_x86_64
+          cp README.md LICENSE fonts/ipaexg00401/IPA_Font_License_Agreement_v1.0.txt build/pixela-desktop_macOS_x86_64
+          cp README.md LICENSE fonts/ipaexg00401/IPA_Font_License_Agreement_v1.0.txt build/pixela-desktop_Windows_x86_64
           zip -j build/release/pixela-desktop_macOS_x86_64.zip build/pixela-desktop_macOS_x86_64/*
           zip -j build/release/pixela-desktop_Windows_x86_64.zip build/pixela-desktop_Windows_x86_64/*
           cd build && tar -zcvf release/pixela-desktop_Linux_x86_64.tar.gz pixela-desktop_Linux_x86_64/*

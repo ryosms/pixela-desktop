@@ -22,5 +22,13 @@ jobs:
           key: v1-${{ runner.os }}-gomod-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             v1-${{ runner.os }}-gomod-
+      - name: dep
+        run: go mod download
+      - name: mock file for statik
+        run: |
+          mkdir -p fonts
+          touch fonts/dummy.ttf
+          go get github.com/rakyll/statik
+          $(go env GOPATH)/bin/statik -f -include=*.ttf -src=fonts
       - name: test
         run: go test -v -cover ./...
