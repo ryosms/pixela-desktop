@@ -24,5 +24,10 @@ jobs:
             v1-${{ runner.os }}-gomod-
       - name: dep
         run: go mod download
+      - name: mock file for statik
+        run: |
+          mkdir -p fonts
+          touch fonts/dummy.ttf
+          go generate
       - name: test
         run: go test -v -cover ./...
