@@ -22,5 +22,7 @@ jobs:
           key: v1-${{ runner.os }}-gomod-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             v1-${{ runner.os }}-gomod-
+      - name: dep
+        run: go mod download
       - name: test
         run: go test -v -cover ./...
