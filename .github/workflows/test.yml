@@ -28,6 +28,7 @@ jobs:
         run: |
           mkdir -p fonts
           touch fonts/dummy.ttf
+          go get github.com/rakyll/statik
           go generate
       - name: test
         run: go test -v -cover ./...
