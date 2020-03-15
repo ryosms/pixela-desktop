@@ -5,6 +5,7 @@ import (
 	"github.com/aarzilli/nucular"
 	"github.com/aarzilli/nucular/rect"
 	"github.com/ryosms/pixela-desktop/pkg/pixela"
+	"golang.org/x/mobile/event/key"
 	"image"
 	"image/color"
 	"time"
@@ -53,6 +54,7 @@ func ShowDetail(w *nucular.Window, username string, graphDef pixela.GraphDefinit
 }
 
 func updateDetailView(w *nucular.Window) {
+	handleKeyEvent(w)
 	g := detailView.graph
 	w.Row(30).Static(50, 0)
 	if w.ButtonText("Back") {
@@ -153,12 +155,7 @@ func showImage(w *nucular.Window) {
 	v.dateString = string(v.dateEditor.Buffer)
 
 	if w.ButtonText("Go") {
-		d, err := time.Parse("2006-01-02", v.dateString)
-		if err != nil {
-			w.Master().PopupOpen("Error", nucular.WindowMovable|nucular.WindowClosable|nucular.WindowTitle|nucular.WindowDynamic|nucular.WindowNoScrollbar, rect.Rect{X: 20, Y: 100, W: 240, H: 150}, true, popUpDateError)
-		} else {
-			changeSvgDate(d)
-		}
+		moveInputDate(w)
 	}
 
 	if w.ButtonText("Next") {
@@ -166,6 +163,27 @@ func showImage(w *nucular.Window) {
 			changeSvgDate(v.displayDate.AddDate(0, 3, 0))
 		} else {
 			changeSvgDate(v.displayDate.AddDate(1, 0, 0))
+		}
+	}
+}
+
+func moveInputDate(w *nucular.Window) {
+	d, err := time.Parse("2006-01-02", detailView.dateString)
+	if err != nil {
+		w.Master().PopupOpen("Error", nucular.WindowMovable|nucular.WindowClosable|nucular.WindowTitle|nucular.WindowDynamic|nucular.WindowNoScrollbar, rect.Rect{X: 20, Y: 100, W: 240, H: 150}, true, popUpDateError)
+	} else {
+		changeSvgDate(d)
+	}
+}
+
+func handleKeyEvent(w *nucular.Window) {
+	if !detailView.dateEditor.Active {
+		return
+	}
+	for _, e := range w.Input().Keyboard.Keys {
+		switch e.Code {
+		case key.CodeReturnEnter, key.CodeKeypadEnter:
+			moveInputDate(w)
 		}
 	}
 }
