@@ -53,6 +53,10 @@ func updateListView(w *nucular.Window) {
 				listView.selectedIndex = 0
 			}
 			listView.centering = true
+		case key.CodeReturnEnter, key.CodeKeypadEnter:
+			if listView.selectedIndex >= 0 && listView.selectedIndex < listView.size {
+				ShowDetail(w, listView.username, (*listView.graphs)[listView.selectedIndex])
+			}
 		}
 	}
 
