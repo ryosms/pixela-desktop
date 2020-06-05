@@ -5,7 +5,7 @@ import (
 	"github.com/aarzilli/nucular"
 	"github.com/aarzilli/nucular/rect"
 	"github.com/ebc-2in2crc/pixela4go"
-	pixelaTypes "github.com/ryosms/pixela-desktop/pkg/pixela"
+	"github.com/ryosms/pixela-desktop/internal/types"
 	"golang.org/x/mobile/event/key"
 	"image"
 	"image/color"
@@ -65,7 +65,7 @@ func updateDetailView(w *nucular.Window) {
 	w.Label(g.Name, "LC")
 
 	w.Row(20).Static(60, 0)
-	w.LabelColored(g.Color, "LT", *(pixelaTypes.DisplayColorByName(g.Color)))
+	w.LabelColored(g.Color, "LT", *(types.DisplayColorByName(g.Color)))
 	w.Label(fmt.Sprintf("id: %s", g.ID), "LT")
 
 	if detailView.img != nil {

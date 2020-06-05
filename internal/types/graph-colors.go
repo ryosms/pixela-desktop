@@ -1,4 +1,4 @@
-package pixela
+package types
 
 import (
 	"image/color"
