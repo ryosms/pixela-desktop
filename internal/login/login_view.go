@@ -3,8 +3,8 @@ package login
 import (
 	"fmt"
 	"github.com/aarzilli/nucular"
+	"github.com/ebc-2in2crc/pixela4go"
 	"github.com/ryosms/pixela-desktop/internal/graphs"
-	"github.com/ryosms/pixela-desktop/pkg/pixela"
 	"golang.org/x/mobile/event/key"
 	"image/color"
 	"strings"
@@ -71,16 +71,15 @@ func handleKeyEvent(w *nucular.Window) {
 }
 
 func execLogin(w *nucular.Window) {
+	login.message = ""
 	if len(strings.TrimSpace(login.username)) == 0 || len(strings.TrimSpace(login.token)) == 0 {
 		login.message = "username and token are required."
 		return
 	}
-	graphList, err := pixela.GetGraphDefinitions(login.username, login.token)
+	client := pixela.New(login.username, login.token)
+	err := graphs.ShowList(w, client)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		login.message = "login failed."
-	} else {
-		login.message = ""
-		graphs.ShowList(w, login.username, graphList)
 	}
 }
