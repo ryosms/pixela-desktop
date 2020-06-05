@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/ebc-2in2crc/pixela4go"
 	"image/color"
 	"strings"
 )
@@ -12,7 +13,7 @@ type Colors struct {
 }
 
 var SHIBAFU = Colors{
-	Name: "shibafu",
+	Name: pixela.GraphColorShibafu,
 	Colors: []color.RGBA{
 		{R: 0x8D, G: 0x6A, B: 0x47, A: 0xFF},
 		{R: 0xB8, G: 0x95, B: 0x72, A: 0xFF},
@@ -28,7 +29,7 @@ var SHIBAFU = Colors{
 }
 
 var MOMIJI = Colors{
-	Name: "momiji",
+	Name: pixela.GraphColorMomiji,
 	Colors: []color.RGBA{
 		{R: 0x6A, G: 0xB1, B: 0x23, A: 0xFF},
 		{R: 0x80, G: 0xD5, B: 0x2B, A: 0xFF},
@@ -44,7 +45,7 @@ var MOMIJI = Colors{
 }
 
 var SORA = Colors{
-	Name: "sora",
+	Name: pixela.GraphColorSora,
 	Colors: []color.RGBA{
 		{R: 0x55, G: 0x55, B: 0x55, A: 0xFF},
 		{R: 0x74, G: 0x74, B: 0x74, A: 0xFF},
@@ -60,7 +61,7 @@ var SORA = Colors{
 }
 
 var ICHOU = Colors{
-	Name: "ichou",
+	Name: pixela.GraphColorIchou,
 	Colors: []color.RGBA{
 		{R: 0x6A, G: 0xB1, B: 0x23, A: 0xFF},
 		{R: 0x80, G: 0xD5, B: 0x2B, A: 0xFF},
@@ -76,7 +77,7 @@ var ICHOU = Colors{
 }
 
 var AJISAI = Colors{
-	Name: "ajisai",
+	Name: pixela.GraphColorAjisai,
 	Colors: []color.RGBA{
 		{R: 0x47, G: 0x8D, B: 0x8D, A: 0xFF},
 		{R: 0x55, G: 0xAA, B: 0xAA, A: 0xFF},
@@ -92,7 +93,7 @@ var AJISAI = Colors{
 }
 
 var KURO = Colors{
-	Name: "kuro",
+	Name: pixela.GraphColorKuro,
 	Colors: []color.RGBA{
 		{R: 0xFF, G: 0x00, B: 0x00, A: 0xFF},
 		{R: 0xFF, G: 0x55, B: 0x55, A: 0xFF},

@@ -106,7 +106,7 @@ func loadSvgImage() {
 	d := &detailView
 	var mode *string
 	if d.modeShort {
-		mode = pixela.String("short")
+		mode = pixela.String(pixela.GraphModeShort)
 	}
 	input := pixela.GraphGetSVGInput{
 		ID:   pixela.String(d.graph.ID),
