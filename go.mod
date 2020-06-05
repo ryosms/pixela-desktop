@@ -1,6 +1,6 @@
 module github.com/ryosms/pixela-desktop
 
-go 1.13
+go 1.14
 
 require (
 	dmitri.shuralyov.com/gpu/mtl v0.0.0-20191203043605-d42048ed14fd // indirect
