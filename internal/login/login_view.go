@@ -5,6 +5,7 @@ import (
 	"github.com/aarzilli/nucular"
 	"github.com/ryosms/pixela-desktop/internal/graphs"
 	"github.com/ryosms/pixela-desktop/pkg/pixela"
+	"golang.org/x/mobile/event/key"
 	"image/color"
 	"strings"
 )
@@ -22,6 +23,7 @@ type loginData struct {
 var login loginData
 
 func UpdateView(w *nucular.Window) {
+	handleKeyEvent(w)
 	w.Row(30).Dynamic(1)
 	w.Label("Login", "LT")
 
@@ -43,17 +45,42 @@ func UpdateView(w *nucular.Window) {
 
 	w.Row(30).Dynamic(1)
 	if w.ButtonText("Login") {
-		if len(strings.TrimSpace(login.username)) == 0 || len(strings.TrimSpace(login.token)) == 0 {
-			login.message = "username and token are required."
-			return
+		execLogin(w)
+	}
+}
+
+func handleKeyEvent(w *nucular.Window) {
+	if !login.usernameEditor.Active && !login.tokenEditor.Active {
+		for _, e := range w.Input().Keyboard.Keys {
+			switch e.Code {
+			case key.CodeTab:
+				login.usernameEditor.Active = true
+			}
 		}
-		graphList, err := pixela.GetGraphDefinitions(login.username, login.token)
-		if err != nil {
-			fmt.Printf("%+v\n", err)
-			login.message = "login failed."
-		} else {
-			login.message = ""
-			graphs.ShowList(w, login.username, graphList)
+		return
+	}
+	for _, e := range w.Input().Keyboard.Keys {
+		switch e.Code {
+		case key.CodeTab:
+			login.usernameEditor.Active = !login.usernameEditor.Active
+			login.tokenEditor.Active = !login.tokenEditor.Active
+		case key.CodeReturnEnter, key.CodeKeypadEnter:
+			execLogin(w)
 		}
+	}
+}
+
+func execLogin(w *nucular.Window) {
+	if len(strings.TrimSpace(login.username)) == 0 || len(strings.TrimSpace(login.token)) == 0 {
+		login.message = "username and token are required."
+		return
+	}
+	graphList, err := pixela.GetGraphDefinitions(login.username, login.token)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+		login.message = "login failed."
+	} else {
+		login.message = ""
+		graphs.ShowList(w, login.username, graphList)
 	}
 }
