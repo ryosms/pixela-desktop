@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/aarzilli/nucular"
 	"github.com/aarzilli/nucular/rect"
-	"github.com/ryosms/pixela-desktop/pkg/pixela"
+	"github.com/ebc-2in2crc/pixela4go"
+	"github.com/ryosms/pixela-desktop/internal/types"
 	"golang.org/x/mobile/event/key"
 	"image"
 	"image/color"
@@ -12,10 +13,11 @@ import (
 )
 
 type GraphDetailView struct {
+	client      *pixela.Client
 	username    string
-	graph       pixela.GraphDefinition
+	graph       *pixela.GraphDefinition
 	parent      *nucular.Window
-	stats       *pixela.GraphStats
+	stats       *pixela.Stats
 	statsError  string
 	modeShort   bool
 	displayDate time.Time
@@ -27,9 +29,9 @@ type GraphDetailView struct {
 
 var detailView GraphDetailView
 
-func ShowDetail(w *nucular.Window, username string, graphDef pixela.GraphDefinition) {
+func ShowDetail(w *nucular.Window, client *pixela.Client, graphDef *pixela.GraphDefinition) {
 	detailView = GraphDetailView{
-		username:    username,
+		client:      client,
 		graph:       graphDef,
 		parent:      w,
 		displayDate: time.Now(),
@@ -43,7 +45,7 @@ func ShowDetail(w *nucular.Window, username string, graphDef pixela.GraphDefinit
 	}()
 
 	go func() {
-		stats, err := pixela.GetGraphStats(detailView.username, detailView.graph.Id)
+		stats, err := client.Graph().Stats(&pixela.GraphStatsInput{ID: pixela.String(graphDef.ID)})
 		if err != nil {
 			detailView.statsError = "failed to get graph stats"
 			fmt.Printf("%+v\n", err)
@@ -63,8 +65,8 @@ func updateDetailView(w *nucular.Window) {
 	w.Label(g.Name, "LC")
 
 	w.Row(20).Static(60, 0)
-	w.LabelColored(g.Color, "LT", *(pixela.DisplayColorByName(g.Color)))
-	w.Label(fmt.Sprintf("id: %s", g.Id), "LT")
+	w.LabelColored(g.Color, "LT", *(types.DisplayColorByName(g.Color)))
+	w.Label(fmt.Sprintf("id: %s", g.ID), "LT")
 
 	if detailView.img != nil {
 		showImage(w)
@@ -89,9 +91,9 @@ func updateDetailView(w *nucular.Window) {
 		w.Row(20).Dynamic(1)
 		w.Label(fmt.Sprintf("Unit: %s", g.Unit), "LT")
 		w.Label(fmt.Sprintf("Type: %s", g.Type), "LT")
-		w.Label(fmt.Sprintf("Timezone: %s", g.Timezone), "LT")
+		w.Label(fmt.Sprintf("Timezone: %s", g.TimeZone), "LT")
 		w.Label(fmt.Sprintf("SelfSufficient: %v", g.SelfSufficient), "LT")
-		w.Label(fmt.Sprintf("Purge Target: %d", len(g.PurgeCacheUrls)), "LT")
+		w.Label(fmt.Sprintf("Purge Target: %d", len(g.PurgeCacheURLs)), "LT")
 
 		w.TreePop()
 	}
@@ -102,7 +104,16 @@ func updateDetailView(w *nucular.Window) {
 
 func loadSvgImage() {
 	d := &detailView
-	svg, err := pixela.GetGraphSvg(d.username, d.graph.Id, d.modeShort, &d.displayDate)
+	var mode *string
+	if d.modeShort {
+		mode = pixela.String(pixela.GraphModeShort)
+	}
+	input := pixela.GraphGetSVGInput{
+		ID:   pixela.String(d.graph.ID),
+		Date: pixela.String(d.displayDate.Format("20060102")),
+		Mode: mode,
+	}
+	svg, err := d.client.Graph().GetSVG(&input)
 	if err != nil {
 		detailView.imgError = "failed to get svg data"
 		fmt.Printf("%+v\n", err)
@@ -188,7 +199,7 @@ func handleKeyEvent(w *nucular.Window) {
 	}
 }
 
-func showStats(w *nucular.Window, st *pixela.GraphStats, unit string) {
+func showStats(w *nucular.Window, st *pixela.Stats, unit string) {
 	w.Row(30).Dynamic(1)
 	w.Label(fmt.Sprintf("Today: %v %s", st.TodaysQuantity, unit), "LT")
 

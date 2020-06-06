@@ -3,14 +3,16 @@ package graphs
 import (
 	"fmt"
 	"github.com/aarzilli/nucular"
-	"github.com/ryosms/pixela-desktop/pkg/pixela"
+	"github.com/ebc-2in2crc/pixela4go"
+	"github.com/pkg/errors"
 	"golang.org/x/mobile/event/key"
 	"time"
 )
 
 type GraphListView struct {
+	client        *pixela.Client
 	username      string
-	graphs        *[]pixela.GraphDefinition
+	graphs        []pixela.GraphDefinition
 	size          int
 	selectedIndex int
 	centering     bool
@@ -25,17 +27,25 @@ const windowFlag = nucular.WindowTitle | nucular.WindowClosable
 
 var listView GraphListView
 
-func ShowList(w *nucular.Window, username string, graphs *[]pixela.GraphDefinition) {
+func ShowList(w *nucular.Window, client *pixela.Client) error {
+	graphs, err := client.Graph().GetAll()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	if !graphs.IsSuccess {
+		return fmt.Errorf(graphs.Message)
+	}
 	listView = GraphListView{
-		username:      username,
-		graphs:        graphs,
-		size:          len(*graphs),
+		client:        client,
+		graphs:        graphs.Graphs,
+		size:          len(graphs.Graphs),
 		selectedIndex: -1,
 
 		clickedIndex: -1,
 		parent:       w,
 	}
 	w.Master().PopupOpen("graph list", windowFlag, w.Bounds, false, updateListView)
+	return nil
 }
 
 func updateListView(w *nucular.Window) {
@@ -55,7 +65,7 @@ func updateListView(w *nucular.Window) {
 			listView.centering = true
 		case key.CodeReturnEnter, key.CodeKeypadEnter:
 			if listView.selectedIndex >= 0 && listView.selectedIndex < listView.size {
-				ShowDetail(w, listView.username, (*listView.graphs)[listView.selectedIndex])
+				ShowDetail(w, listView.client, &listView.graphs[listView.selectedIndex])
 			}
 		}
 	}
@@ -65,13 +75,13 @@ func updateListView(w *nucular.Window) {
 		w.Row(40).Dynamic(1)
 		for gl.Next() {
 			i := gl.Index()
-			graph := (*listView.graphs)[i]
+			graph := listView.graphs[i]
 			selected := i == listView.selectedIndex
 			label := fmt.Sprintf("%s: %s\n    %s",
-				graph.Id, graph.Name, graph.Color)
+				graph.ID, graph.Name, graph.Color)
 			if w.SelectableLabel(label, "LT", &selected) {
 				if doubleClick(i, listView.clickedIndex, listView.clickedTime) {
-					ShowDetail(listView.parent, listView.username, graph)
+					ShowDetail(listView.parent, listView.client, &graph)
 					return
 				}
 				listView.clickedIndex = i

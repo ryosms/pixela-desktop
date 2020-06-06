@@ -54,9 +54,9 @@ type text struct {
 
 var white = color.RGBA{R: 255, G: 255, B: 255, A: 255}
 
-func convertSvg(svg []byte) (*image.RGBA, error) {
+func convertSvg(svg string) (*image.RGBA, error) {
 	var pixels graph
-	err := xml.Unmarshal(svg, &pixels)
+	err := xml.Unmarshal([]byte(svg), &pixels)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
